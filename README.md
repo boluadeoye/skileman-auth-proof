@@ -1,21 +1,27 @@
-# Skileman Technical Proof: Enterprise Auth Architecture
+# Skileman Backend Task: Auth Service
 
-### 🏗️ Architectural Philosophy
-For this MVP round, I chose to bypass the standard "all-in-one-file" approach. Instead, I implemented a **Layered Microservice Pattern** to demonstrate how I architect for **high concurrency, maintainability, and security** at scale.
+For this MVP, I decided to skip the standard "single-file" API route approach. Instead, I structured this as a standalone microservice to demonstrate how I handle code organization in production apps.
 
-### 📂 Structure Strategy
-- **`src/modules/auth`**: Domain-Driven Design (DDD) approach. Auth logic is isolated from other potential domains.
-- **`src/lib/validation`**: Schema-first design using **Zod**. We validate at the edge before business logic is touched.
-- **`src/app/api/v1`**: API Versioning implemented from Day 1 to prevent future breaking changes.
+### 🏗️ The Approach
+I separated the concerns into three distinct layers:
+1.  **API Layer (`/app/api`)**: Handles the HTTP request, status codes, and response formatting.
+2.  **Service Layer (`/services`)**: Contains the actual business logic. This makes it easier to unit test later without mocking the entire HTTP request.
+3.  **Validation Layer (`/lib`)**: I used **Zod** to sanitize inputs before they even reach the logic.
 
-### 🛡️ Security & Observability Habits
-1.  **Trace IDs:** Every request generates a UUID (`trace_id`). In a production environment, this would be passed to logs (Datadog/Axiom) for distributed tracing.
-2.  **RFC 7807 Error Handling:** Errors follow the IETF standard for HTTP APIs (Type, Title, Status, Detail), ensuring frontend clients have a predictable error contract.
-3.  **Strict Schema Validation:** Zod is configured to `.strict()`, stripping any unknown fields to prevent **Mass Assignment Vulnerabilities**.
-4.  **Cryptographic Integrity:** While this is a mock, the service layer is architected to support **Argon2id** hashing.
+### 🛡️ Security Decisions
+- **Strict Validation**: The Zod schema is set to `.strict()` to strip out any unexpected fields in the payload (prevents mass assignment issues).
+- **Error Standards**: I used the **RFC 7807** format for errors. It’s cleaner for frontend teams to parse than generic text strings.
+- **Hashing**: In the mock service, I referenced **Argon2id**. For a real deployment, I'd prefer that over Bcrypt for better GPU resistance.
 
-### 🚀 Scalability Note
-This is not just a script; it is a **Blueprint**. This structure can be deployed to Vercel Edge or a Docker container immediately with zero refactoring.
+### 🚀 Running Locally
+1.  Install dependencies:
+    ```bash
+    npm install
+    ```
+2.  Start the dev server:
+    ```bash
+    npm run dev
+    ```
+3.  Test the endpoint at `POST http://localhost:3000/api/v1/auth/login`
 
 **Bolu Adeoye**
-*AI Systems Architect & Founding Engineer Candidate*
