@@ -1,13 +1,9 @@
 import { z } from "zod";
 
-/**
- * @description Strict validation schema for authentication
- * @security Enforces email format and password complexity policies
- */
 export const LoginSchema = z.object({
   email: z
     .string()
-    .email({ message: "Invalid email format provided." })
+    .email()
     .min(5)
     .max(255)
     .trim()
@@ -15,6 +11,6 @@ export const LoginSchema = z.object({
     
   password: z
     .string()
-    .min(8, { message: "Password does not meet complexity requirements (min 8 chars)." })
+    .min(8)
     .max(100),
-}).strict(); // Security: Reject unknown payloads to prevent pollution
+}).strict();
